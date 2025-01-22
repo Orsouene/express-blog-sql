@@ -19,17 +19,33 @@ function show(req, res) {
   // ID INSERITO NEL URL
   const id = parseInt(req.params.id);
   // Dichiarazione dell mia query
-  const sql = ` SELECT posts.*,  GROUP_CONCAT(tags.label) AS tag_label
+  // Dichiarazione dell mia query
+  const postsSql = "SELECT * FROM posts WHERE id = ?";
+  // arrayPost + tags
+  const tagsSql = ` SELECT posts.*,  GROUP_CONCAT(tags.label) AS tag_label
 FROM posts
 JOIN post_tag ON posts.id = post_tag.post_id
 JOIN tags ON tags.id = post_tag.tag_id
 WHERE posts.id =? `;
+
   // Eseguo la query  SQL
-  connection.query(sql, [id], (err, results) => {
+  connection.query(postsSql, [id], (err, postsResults) => {
     if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
-    // SE LA QUERY è ANDATA A BUON FINE
-    console.log(results);
-    res.json(results);
+    if (postsResults.length === 0)
+      return res.status(404).json({ error: "Post not found" });
+    // recupero il dolce
+    const post = postsResults[0];
+
+    // Eseguo la query  SQL  array del posts + il tags
+    connection.query(tagsSql, [id], (err, tagsResults) => {
+      if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
+
+      post.tags = tagsResults;
+
+      // SE LA QUERY è ANDATA A BUON FINE
+      console.log(post);
+      res.json(post);
+    });
   });
 }
 // CREATE
