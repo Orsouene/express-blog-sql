@@ -15,7 +15,19 @@ function index(req, res) {
 }
 
 // SHOW
-function show(req, res) {}
+function show(req, res) {
+  // ID INSERITO NEL URL
+  const id = parseInt(req.params.id);
+  // Dichiarazione dell mia query
+  const sql = "SELECT * FROM `db_blog`.`posts` WHERE (`id` = '?')";
+  // Eseguo la query  SQL
+  connection.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
+    // SE LA QUERY è ANDATA A BUON FINE
+    console.log(results);
+    res.json(results);
+  });
+}
 // CREATE
 function store(req, res) {}
 // UPDATE
@@ -24,7 +36,9 @@ function update(req, res) {}
 function destroy(req, res) {
   // ID inserito nel URL
   const id = parseInt(req.params.id);
+  // DICHIARO LA MIA QUERY
   const sql = "DELETE FROM `db_blog`.`posts` WHERE (`id` = '?')";
+  // ESERGUO LA QUERY
   connection.query(sql, [id], (err, results) => {
     // se c'è un errore nell esecuzione ella query
     if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
