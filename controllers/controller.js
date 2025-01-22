@@ -19,7 +19,11 @@ function show(req, res) {
   // ID INSERITO NEL URL
   const id = parseInt(req.params.id);
   // Dichiarazione dell mia query
-  const sql = "SELECT * FROM `db_blog`.`posts` WHERE (`id` = '?')";
+  const sql = ` SELECT posts.*,  GROUP_CONCAT(tags.label) AS tag_label
+FROM posts
+JOIN post_tag ON posts.id = post_tag.post_id
+JOIN tags ON tags.id = post_tag.tag_id
+WHERE posts.id =? `;
   // Eseguo la query  SQL
   connection.query(sql, [id], (err, results) => {
     if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
