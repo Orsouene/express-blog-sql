@@ -22,7 +22,7 @@ function show(req, res) {
   // Dichiarazione dell mia query
   const postsSql = "SELECT * FROM posts WHERE id = ?";
   // arrayPost + tags
-  const tagsSql = ` SELECT posts.*,  GROUP_CONCAT(tags.label) AS tag_label
+  const tagsSql = ` SELECT  GROUP_CONCAT(tags.label) AS tag_label
 FROM posts
 JOIN post_tag ON posts.id = post_tag.post_id
 JOIN tags ON tags.id = post_tag.tag_id
@@ -33,16 +33,16 @@ WHERE posts.id =? `;
     if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
     if (postsResults.length === 0)
       return res.status(404).json({ error: "Post not found" });
-    // recupero il dolce
-    const post = postsResults[0];
 
+    // recupero  il post del  dolce
+    const post = postsResults[0];
+    console.log(post);
     // Eseguo la query  SQL  array del posts + il tags
     connection.query(tagsSql, [id], (err, tagsResults) => {
       if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
-
+      // agguingo le tags alla array del dolce (POSTS)
       post.tags = tagsResults;
-
-      // SE LA QUERY è ANDATA A BUON FINE
+      // SE LA QUERY è ANDATA A BUON FINE =>
       console.log(post);
       res.json(post);
     });
@@ -56,12 +56,13 @@ function update(req, res) {}
 function destroy(req, res) {
   // ID inserito nel URL
   const id = parseInt(req.params.id);
-  // DICHIARO LA MIA QUERY
-  const sql = "DELETE FROM `db_blog`.`posts` WHERE (`id` = '?')";
+  // DICHIARO LA MIA QUERY(PREPARAZIONE)
+  const sql = "DELETE FROM posts WHERE (`id` = '?')";
   // ESERGUO LA QUERY
   connection.query(sql, [id], (err, results) => {
     // se c'è un errore nell esecuzione ella query
     if (err) return res.status(500).json({ error: "DB QUERY FAILED" });
+    //  SE è andata a buon fine =>
     console.log(results);
     res.sendStatus(204);
   });
